@@ -73,16 +73,65 @@ public class TicTacToe {
         return new int[]{row, col};
     }
 
+    // UC5: Validate move — row/col must be 0-2 and cell must be empty
+    static boolean isValidMove(int row, int col) {
+        return row >= 0 && row <= 2
+            && col >= 0 && col <= 2
+            && board[row][col] == '-';
+    }
+
+    // --- Game helpers (uses UC1-UC5) ---
+    static boolean checkWin(char symbol) {
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] == symbol && board[i][1] == symbol && board[i][2] == symbol) return true;
+            if (board[0][i] == symbol && board[1][i] == symbol && board[2][i] == symbol) return true;
+        }
+        return (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol)
+            || (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol);
+    }
+
+    static boolean isBoardFull() {
+        for (int r = 0; r < 3; r++)
+            for (int c = 0; c < 3; c++)
+                if (board[r][c] == '-') return false;
+        return true;
+    }
+
+    static void computerMove() {
+        int[] idx;
+        do {
+            idx = slotToIndex(random.nextInt(9) + 1);
+        } while (!isValidMove(idx[0], idx[1]));   // UC5 guards computer move too
+        board[idx[0]][idx[1]] = computerSymbol;
+        System.out.println("Computer placed " + computerSymbol);
+    }
+
     public static void main(String[] args) {
-        System.out.println("=== Tic-Tac-Toe ===");
+        System.out.println("=== Tic-Tac-Toe: Human vs Computer ===");
         initBoard();
         printBoard();
         toss();
-        System.out.println("Player: " + playerSymbol + " | Computer: " + computerSymbol);
 
-        int slot  = getUserSlot();
-        int[] idx = slotToIndex(slot);
-        System.out.println("Slot " + slot + " → row=" + idx[0] + ", col=" + idx[1]);
+        while (true) {
+            printBoard();
+            if (playerTurn) {
+                int slot;
+                int[] idx;
+                do {
+                    slot = getUserSlot();          // UC3
+                    idx  = slotToIndex(slot);      // UC4
+                    if (!isValidMove(idx[0], idx[1]))  // UC5
+                        System.out.println("Slot taken. Try another.");
+                } while (!isValidMove(idx[0], idx[1]));
+                board[idx[0]][idx[1]] = playerSymbol;
+                if (checkWin(playerSymbol)) { printBoard(); System.out.println("You win!"); break; }
+            } else {
+                computerMove();
+                if (checkWin(computerSymbol)) { printBoard(); System.out.println("Computer wins!"); break; }
+            }
+            if (isBoardFull()) { printBoard(); System.out.println("It's a draw!"); break; }
+            playerTurn = !playerTurn;
+        }
         scanner.close();
     }
 }
