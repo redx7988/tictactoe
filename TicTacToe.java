@@ -60,10 +60,17 @@ public class TicTacToe {
                     System.out.println("Invalid. Must be between 1 and 9.");
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.next(); // discard bad token
+                scanner.next();
             }
         }
         return slot;
+    }
+
+    // UC4: Convert slot (1-9) to row and column using division and modulo
+    static int[] slotToIndex(int slot) {
+        int row = (slot - 1) / 3;
+        int col = (slot - 1) % 3;
+        return new int[]{row, col};
     }
 
     public static void main(String[] args) {
@@ -72,8 +79,10 @@ public class TicTacToe {
         printBoard();
         toss();
         System.out.println("Player: " + playerSymbol + " | Computer: " + computerSymbol);
-        int slot = getUserSlot();
-        System.out.println("You entered slot: " + slot);
+
+        int slot  = getUserSlot();
+        int[] idx = slotToIndex(slot);
+        System.out.println("Slot " + slot + " → row=" + idx[0] + ", col=" + idx[1]);
         scanner.close();
     }
 }
