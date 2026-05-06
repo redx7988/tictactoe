@@ -95,12 +95,31 @@ public class TicTacToe {
         System.out.println("Computer placed '" + computerSymbol + "'");
     }
 
-    // Helper: check if board is full (used by UC8 for draw detection)
+    // UC8 helper: check if board is full (draw condition)
     static boolean isBoardFull() {
         for (int r = 0; r < 3; r++)
             for (int c = 0; c < 3; c++)
                 if (board[r][c] == '-') return false;
         return true;
+    }
+
+    // UC9: Check winning condition — rows, columns, and both diagonals
+    static boolean checkWin(char symbol) {
+        // Check all 3 rows
+        for (int r = 0; r < 3; r++)
+            if (board[r][0] == symbol && board[r][1] == symbol && board[r][2] == symbol)
+                return true;
+        // Check all 3 columns
+        for (int c = 0; c < 3; c++)
+            if (board[0][c] == symbol && board[1][c] == symbol && board[2][c] == symbol)
+                return true;
+        // Check main diagonal (top-left to bottom-right)
+        if (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol)
+            return true;
+        // Check anti-diagonal (top-right to bottom-left)
+        if (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol)
+            return true;
+        return false;
     }
 
     // UC8: Continuous turn-based game loop — runs until win or draw
@@ -109,39 +128,46 @@ public class TicTacToe {
             printBoard();
 
             if (playerTurn) {
-                // Player's turn
                 int slot;
                 int[] idx;
                 do {
-                    slot = getUserSlot();       // UC3
-                    idx  = slotToIndex(slot);  // UC4
-                    if (!isValidMove(idx[0], idx[1])) // UC5
+                    slot = getUserSlot();
+                    idx  = slotToIndex(slot);
+                    if (!isValidMove(idx[0], idx[1]))
                         System.out.println("Slot already taken. Try another.");
                 } while (!isValidMove(idx[0], idx[1]));
-                placeMove(idx[0], idx[1], playerSymbol); // UC6
+                placeMove(idx[0], idx[1], playerSymbol);
+
+                if (checkWin(playerSymbol)) {          // UC9
+                    printBoard();
+                    System.out.println("You win!");
+                    break;
+                }
             } else {
-                // Computer's turn
-                computerMove(); // UC7
+                computerMove();
+                if (checkWin(computerSymbol)) {        // UC9
+                    printBoard();
+                    System.out.println("Computer wins!");
+                    break;
+                }
             }
 
-            // Check draw after each move
             if (isBoardFull()) {
                 printBoard();
                 System.out.println("It's a draw!");
                 break;
             }
 
-            // Switch turn
             playerTurn = !playerTurn;
         }
     }
 
     public static void main(String[] args) {
         System.out.println("=== Tic-Tac-Toe: Human vs Computer ===");
-        initBoard();    // UC1
-        printBoard();   // UC1
-        toss();         // UC2
-        playGame();     // UC8
+        initBoard();
+        printBoard();
+        toss();
+        playGame();
         scanner.close();
     }
 }
