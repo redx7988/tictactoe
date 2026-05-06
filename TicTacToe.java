@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.Scanner;
 
 public class TicTacToe {
 
@@ -9,6 +10,9 @@ public class TicTacToe {
     static char playerSymbol, computerSymbol;
     static boolean playerTurn;
     static Random random = new Random();
+
+    // UC3: Scanner for user input
+    static Scanner scanner = new Scanner(System.in);
 
     // UC1: Initialize all cells with '-'
     static void initBoard() {
@@ -31,7 +35,7 @@ public class TicTacToe {
 
     // UC2: Toss to randomly assign symbols and decide first player
     static void toss() {
-        int result = random.nextInt(2); // 0 = player wins toss, 1 = computer wins
+        int result = random.nextInt(2);
         if (result == 0) {
             playerSymbol   = 'X';
             computerSymbol = 'O';
@@ -45,11 +49,31 @@ public class TicTacToe {
         }
     }
 
+    // UC3: Read a valid slot number (1-9) from user
+    static int getUserSlot() {
+        int slot = -1;
+        while (slot < 1 || slot > 9) {
+            System.out.print("Enter slot (1-9): ");
+            if (scanner.hasNextInt()) {
+                slot = scanner.nextInt();
+                if (slot < 1 || slot > 9)
+                    System.out.println("Invalid. Must be between 1 and 9.");
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next(); // discard bad token
+            }
+        }
+        return slot;
+    }
+
     public static void main(String[] args) {
         System.out.println("=== Tic-Tac-Toe ===");
         initBoard();
         printBoard();
         toss();
         System.out.println("Player: " + playerSymbol + " | Computer: " + computerSymbol);
+        int slot = getUserSlot();
+        System.out.println("You entered slot: " + slot);
+        scanner.close();
     }
 }
