@@ -89,28 +89,59 @@ public class TicTacToe {
     static void computerMove() {
         int[] idx;
         do {
-            int randomSlot = random.nextInt(9) + 1; // generate random slot 1-9
-            idx = slotToIndex(randomSlot);           // UC4: convert to row/col
-        } while (!isValidMove(idx[0], idx[1]));      // UC5: loop until valid
-        placeMove(idx[0], idx[1], computerSymbol);   // UC6: place on board
+            idx = slotToIndex(random.nextInt(9) + 1);
+        } while (!isValidMove(idx[0], idx[1]));
+        placeMove(idx[0], idx[1], computerSymbol);
         System.out.println("Computer placed '" + computerSymbol + "'");
     }
 
+    // Helper: check if board is full (used by UC8 for draw detection)
+    static boolean isBoardFull() {
+        for (int r = 0; r < 3; r++)
+            for (int c = 0; c < 3; c++)
+                if (board[r][c] == '-') return false;
+        return true;
+    }
+
+    // UC8: Continuous turn-based game loop — runs until win or draw
+    static void playGame() {
+        while (true) {
+            printBoard();
+
+            if (playerTurn) {
+                // Player's turn
+                int slot;
+                int[] idx;
+                do {
+                    slot = getUserSlot();       // UC3
+                    idx  = slotToIndex(slot);  // UC4
+                    if (!isValidMove(idx[0], idx[1])) // UC5
+                        System.out.println("Slot already taken. Try another.");
+                } while (!isValidMove(idx[0], idx[1]));
+                placeMove(idx[0], idx[1], playerSymbol); // UC6
+            } else {
+                // Computer's turn
+                computerMove(); // UC7
+            }
+
+            // Check draw after each move
+            if (isBoardFull()) {
+                printBoard();
+                System.out.println("It's a draw!");
+                break;
+            }
+
+            // Switch turn
+            playerTurn = !playerTurn;
+        }
+    }
+
     public static void main(String[] args) {
-        System.out.println("=== Tic-Tac-Toe ===");
-        initBoard();
-        printBoard();
-        toss();
-
-        // Demo: player move then computer move
-        int slot  = getUserSlot();
-        int[] idx = slotToIndex(slot);
-        if (isValidMove(idx[0], idx[1]))
-            placeMove(idx[0], idx[1], playerSymbol);
-
-        printBoard();
-        computerMove(); // UC7
-        printBoard();
+        System.out.println("=== Tic-Tac-Toe: Human vs Computer ===");
+        initBoard();    // UC1
+        printBoard();   // UC1
+        toss();         // UC2
+        playGame();     // UC8
         scanner.close();
     }
 }
