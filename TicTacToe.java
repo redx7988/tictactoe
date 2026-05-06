@@ -83,7 +83,17 @@ public class TicTacToe {
     // UC6: Place a symbol on the board at the given row and column
     static void placeMove(int row, int col, char symbol) {
         board[row][col] = symbol;
-        System.out.println("Placed '" + symbol + "' at row=" + row + ", col=" + col);
+    }
+
+    // UC7: Computer makes a random valid move
+    static void computerMove() {
+        int[] idx;
+        do {
+            int randomSlot = random.nextInt(9) + 1; // generate random slot 1-9
+            idx = slotToIndex(randomSlot);           // UC4: convert to row/col
+        } while (!isValidMove(idx[0], idx[1]));      // UC5: loop until valid
+        placeMove(idx[0], idx[1], computerSymbol);   // UC6: place on board
+        System.out.println("Computer placed '" + computerSymbol + "'");
     }
 
     public static void main(String[] args) {
@@ -92,14 +102,14 @@ public class TicTacToe {
         printBoard();
         toss();
 
-        // Demo: player picks a slot, validate, then place
-        int slot  = getUserSlot();        // UC3
-        int[] idx = slotToIndex(slot);    // UC4
-        if (isValidMove(idx[0], idx[1])) // UC5
-            placeMove(idx[0], idx[1], playerSymbol); // UC6
-        else
-            System.out.println("Invalid move.");
+        // Demo: player move then computer move
+        int slot  = getUserSlot();
+        int[] idx = slotToIndex(slot);
+        if (isValidMove(idx[0], idx[1]))
+            placeMove(idx[0], idx[1], playerSymbol);
 
+        printBoard();
+        computerMove(); // UC7
         printBoard();
         scanner.close();
     }
