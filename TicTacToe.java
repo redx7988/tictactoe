@@ -80,58 +80,27 @@ public class TicTacToe {
             && board[row][col] == '-';
     }
 
-    // --- Game helpers (uses UC1-UC5) ---
-    static boolean checkWin(char symbol) {
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0] == symbol && board[i][1] == symbol && board[i][2] == symbol) return true;
-            if (board[0][i] == symbol && board[1][i] == symbol && board[2][i] == symbol) return true;
-        }
-        return (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol)
-            || (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol);
-    }
-
-    static boolean isBoardFull() {
-        for (int r = 0; r < 3; r++)
-            for (int c = 0; c < 3; c++)
-                if (board[r][c] == '-') return false;
-        return true;
-    }
-
-    static void computerMove() {
-        int[] idx;
-        do {
-            idx = slotToIndex(random.nextInt(9) + 1);
-        } while (!isValidMove(idx[0], idx[1]));   // UC5 guards computer move too
-        board[idx[0]][idx[1]] = computerSymbol;
-        System.out.println("Computer placed " + computerSymbol);
+    // UC6: Place a symbol on the board at the given row and column
+    static void placeMove(int row, int col, char symbol) {
+        board[row][col] = symbol;
+        System.out.println("Placed '" + symbol + "' at row=" + row + ", col=" + col);
     }
 
     public static void main(String[] args) {
-        System.out.println("=== Tic-Tac-Toe: Human vs Computer ===");
+        System.out.println("=== Tic-Tac-Toe ===");
         initBoard();
         printBoard();
         toss();
 
-        while (true) {
-            printBoard();
-            if (playerTurn) {
-                int slot;
-                int[] idx;
-                do {
-                    slot = getUserSlot();          // UC3
-                    idx  = slotToIndex(slot);      // UC4
-                    if (!isValidMove(idx[0], idx[1]))  // UC5
-                        System.out.println("Slot taken. Try another.");
-                } while (!isValidMove(idx[0], idx[1]));
-                board[idx[0]][idx[1]] = playerSymbol;
-                if (checkWin(playerSymbol)) { printBoard(); System.out.println("You win!"); break; }
-            } else {
-                computerMove();
-                if (checkWin(computerSymbol)) { printBoard(); System.out.println("Computer wins!"); break; }
-            }
-            if (isBoardFull()) { printBoard(); System.out.println("It's a draw!"); break; }
-            playerTurn = !playerTurn;
-        }
+        // Demo: player picks a slot, validate, then place
+        int slot  = getUserSlot();        // UC3
+        int[] idx = slotToIndex(slot);    // UC4
+        if (isValidMove(idx[0], idx[1])) // UC5
+            placeMove(idx[0], idx[1], playerSymbol); // UC6
+        else
+            System.out.println("Invalid move.");
+
+        printBoard();
         scanner.close();
     }
 }
